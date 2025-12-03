@@ -21,8 +21,6 @@ public class TransferController {
         this.transferService = transferService;
     }
 
-    // Créer un transfert (page "Transférer")
-    // POST /api/users/{id}/transfers
     @PostMapping
     public ResponseEntity<TransferResponseDTO> createTransfer(
             @PathVariable Integer id,
@@ -35,14 +33,11 @@ public class TransferController {
                 req.description()
         );
 
-        // On considère la perspective de l’émetteur : relation = destinataire
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(toSentDto(transfer));
     }
 
-    // Historique des transferts envoyés (pour "Mes Transactions")
-    // GET /api/users/{id}/transfers/sent?page=0&size=10...
     @GetMapping("/sent")
     public ResponseEntity<Page<TransferResponseDTO>> listSent(
             @PathVariable Integer id,
@@ -53,9 +48,6 @@ public class TransferController {
         return ResponseEntity.ok(dtoPage);
     }
 
-    // (optionnel mais cohérent avec ton service)
-    // Historique des transferts reçus
-    // GET /api/users/{id}/transfers/received
     @GetMapping("/received")
     public ResponseEntity<Page<TransferResponseDTO>> listReceived(
             @PathVariable Integer id,
@@ -66,10 +58,7 @@ public class TransferController {
         return ResponseEntity.ok(dtoPage);
     }
 
-    // ----- mapping Entity -> DTO -----
-
     private static TransferResponseDTO toSentDto(Transfer t) {
-        // Pour un transfert "envoyé", la relation affichée est le RECEIVER
         return new TransferResponseDTO(
                 t.getId(),
                 t.getReceiver().getUsername(),
@@ -79,7 +68,6 @@ public class TransferController {
     }
 
     private static TransferResponseDTO toReceivedDto(Transfer t) {
-        // Pour un transfert "reçu", la relation affichée est le SENDER
         return new TransferResponseDTO(
                 t.getId(),
                 t.getSender().getUsername(),

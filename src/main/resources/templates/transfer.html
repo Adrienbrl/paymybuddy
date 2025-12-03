@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Transférer – Pay My Buddy</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background-color: #f5f5f5;
+        }
+
+        .app-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background-color: #ffffff;
+            padding: 16px 80px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand-text {
+            font-weight: 600;
+        }
+
+        nav a {
+            margin-left: 24px;
+            text-decoration: none;
+            font-size: 14px;
+            color: #333333;
+        }
+
+        nav a.active {
+            color: #1976d2;
+            font-weight: 600;
+        }
+
+        main {
+            flex: 1;
+            padding: 40px 80px;
+        }
+
+        .transfer-form {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 40px;
+        }
+
+        .transfer-form select,
+        .transfer-form input {
+            padding: 10px 12px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            font-size: 14px;
+            min-width: 200px;
+        }
+
+        .amount-input {
+            max-width: 120px;
+        }
+
+        .primary-button {
+            padding: 10px 24px;
+            border-radius: 4px;
+            border: none;
+            background-color: #1976d2;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .table-card {
+            background-color: #ffffff;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            padding: 24px;
+            max-width: 800px;
+        }
+
+        .table-card h2 {
+            margin-top: 0;
+            margin-bottom: 16px;
+            font-size: 16px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        th, td {
+            padding: 8px 12px;
+            text-align: left;
+        }
+
+        th {
+            font-weight: 600;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #fafafa;
+        }
+    </style>
+</head>
+
+<body>
+<div class="app-container">
+
+    <header>
+        <div class="brand-text">Pay My Buddy</div>
+        <nav>
+            <a th:href="@{/transfer}" class="active">Transférer</a>
+            <a th:href="@{/profile}">Profil</a>
+            <a th:href="@{/add-connection}">Ajouter relation</a>
+            <a th:href="@{/logout}">Se déconnecter</a>
+        </nav>
+    </header>
+
+    <main>
+
+        <!-- Formulaire de transfert -->
+        <form class="transfer-form" th:action="@{/transfer}" method="post">
+            <select name="toUserId" required>
+                <option value="" selected disabled>Sélectionner une relation</option>
+                <!-- Exemple Thymeleaf si tu ajoutes des relations dans le modèle plus tard :
+                <option th:each="rel : ${relations}"
+                        th:value="${rel.id}"
+                        th:text="${rel.username}">
+                </option>
+                -->
+            </select>
+
+            <input type="text" name="description" placeholder="Description" required>
+
+            <input class="amount-input" type="number" step="0.01" min="0" name="amount" value="0" required>
+
+            <button type="submit" class="primary-button">Payer</button>
+        </form>
+
+        <!-- Tableau des transactions -->
+        <section class="table-card">
+            <h2>Mes Transactions</h2>
+
+            <table>
+                <thead>
+                <tr>
+                    <th>Relations</th>
+                    <th>Description</th>
+                    <th>Montant</th>
+                </tr>
+                </thead>
+                <tbody>
+                <!-- Exemple statique (tu remplaceras par Thymeleaf plus tard) -->
+                <tr>
+                    <td>Laure-Anne</td>
+                    <td>Restaurant</td>
+                    <td>10€</td>
+                </tr>
+                <tr>
+                    <td>Clara</td>
+                    <td>Voyage</td>
+                    <td>25€</td>
+                </tr>
+                <tr>
+                    <td>Luc</td>
+                    <td>Billets de cinéma</td>
+                    <td>8€</td>
+                </tr>
+                </tbody>
+            </table>
+        </section>
+
+    </main>
+</div>
+</body>
+</html>

@@ -75,4 +75,5 @@ public class User {
         this.connections.remove(other);
         other.connectedToMe.remove(this);
     }
+
 }

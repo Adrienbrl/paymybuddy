@@ -17,14 +17,12 @@ public class UserController {
         this.userService = userService;
     }
 
-    // --- INSCRIPTION ---
     @PostMapping("/register")
     public ResponseEntity<UserResponseDTO> register(@Valid @RequestBody RegisterRequestDTO req) {
         User u = userService.register(req.username(), req.email(), req.password());
         return ResponseEntity.status(HttpStatus.CREATED).body(toDto(u));
     }
 
-    // --- CONNEXION (email + password) ---
     @PostMapping("/login")
     public ResponseEntity<UserResponseDTO> login(@Valid @RequestBody LoginRequestDTO req) {
         User u = userService.authenticateByEmail(req.email(), req.password());
@@ -32,14 +30,12 @@ public class UserController {
         return ResponseEntity.ok(toDto(u));
     }
 
-    // --- RÉCUPÉRER UN UTILISATEUR PAR ID ---
     @GetMapping("/{id}")
     public ResponseEntity<UserResponseDTO> getById(@PathVariable Integer id) {
         User u = userService.getById(id);
         return ResponseEntity.ok(toDto(u));
     }
 
-    // --- AJOUTER UNE RELATION ---
     @PostMapping("/{id}/connections")
     public ResponseEntity<Void> addConnection(
             @PathVariable Integer id,
@@ -49,7 +45,6 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    // --- METTRE À JOUR LE PROFIL (username/email) ---
     @PutMapping("/{id}/profile")
     public ResponseEntity<UserResponseDTO> updateProfile(
             @PathVariable Integer id,
@@ -59,7 +54,6 @@ public class UserController {
         return ResponseEntity.ok(toDto(u));
     }
 
-    // --- CHANGER LE MOT DE PASSE ---
     @PutMapping("/{id}/password")
     public ResponseEntity<Void> changePassword(
             @PathVariable Integer id,
@@ -69,7 +63,6 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    // --- mapping User -> DTO de sortie ---
     private static UserResponseDTO toDto(User u) {
         return new UserResponseDTO(u.getId(), u.getUsername(), u.getEmail());
     }
