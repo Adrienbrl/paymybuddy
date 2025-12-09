@@ -58,6 +58,12 @@ public class UserService {
                 .orElseThrow(() -> new NoSuchElementException("Utilisateur introuvable"));
     }
 
+    public User getByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new NoSuchElementException("Utilisateur introuvable"));
+    }
+
+
     /* --- FONCTIONS POUR LA PAGE D'AJOUT D'UNE RELATION --- */
 
     @Transactional

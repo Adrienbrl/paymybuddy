@@ -1,6 +1,5 @@
 package com.paymybuddy.paymybuddy.controller;
 
-import com.paymybuddy.paymybuddy.domain.Transfer;
 import com.paymybuddy.paymybuddy.dto.CreateTransferRequestDTO;
 import com.paymybuddy.paymybuddy.dto.TransferResponseDTO;
 import com.paymybuddy.paymybuddy.service.TransferService;
@@ -26,16 +25,16 @@ public class TransferController {
             @PathVariable Integer id,
             @Valid @RequestBody CreateTransferRequestDTO req
     ) {
-        Transfer transfer = transferService.createTransfer(
-                id,                      // senderId
-                req.toUserId(),          // receiverId
+        TransferResponseDTO transfer = transferService.createTransfer(
+                id,               // senderId
+                req.toUserId(),   // receiverId
                 req.amount(),
                 req.description()
         );
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(toSentDto(transfer));
+                .body(transfer);
     }
 
     @GetMapping("/sent")
@@ -43,9 +42,8 @@ public class TransferController {
             @PathVariable Integer id,
             Pageable pageable
     ) {
-        Page<Transfer> page = transferService.listSent(id, pageable);
-        Page<TransferResponseDTO> dtoPage = page.map(TransferController::toSentDto);
-        return ResponseEntity.ok(dtoPage);
+        Page<TransferResponseDTO> page = transferService.listSent(id, pageable);
+        return ResponseEntity.ok(page);
     }
 
     @GetMapping("/received")
@@ -53,27 +51,7 @@ public class TransferController {
             @PathVariable Integer id,
             Pageable pageable
     ) {
-        Page<Transfer> page = transferService.listReceived(id, pageable);
-        Page<TransferResponseDTO> dtoPage = page.map(TransferController::toReceivedDto);
-        return ResponseEntity.ok(dtoPage);
-    }
-
-    private static TransferResponseDTO toSentDto(Transfer t) {
-        return new TransferResponseDTO(
-                t.getId(),
-                t.getReceiver().getUsername(),
-                t.getDescription(),
-                t.getAmount()
-        );
-    }
-
-    private static TransferResponseDTO toReceivedDto(Transfer t) {
-        return new TransferResponseDTO(
-                t.getId(),
-                t.getSender().getUsername(),
-                t.getDescription(),
-                t.getAmount()
-        );
+        Page<TransferResponseDTO> page = transferService.listReceived(id, pageable);
+        return ResponseEntity.ok(page);
     }
 }
-

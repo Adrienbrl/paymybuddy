@@ -2,6 +2,7 @@ package com.paymybuddy.paymybuddy.service;
 
 import com.paymybuddy.paymybuddy.domain.Transfer;
 import com.paymybuddy.paymybuddy.domain.User;
+import com.paymybuddy.paymybuddy.dto.TransferResponseDTO;
 import com.paymybuddy.paymybuddy.repository.TransferRepository;
 import com.paymybuddy.paymybuddy.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -15,6 +16,7 @@ import java.util.NoSuchElementException;
 
 @Service
 public class TransferService {
+
     private final TransferRepository transferRepository;
     private final UserRepository userRepository;
 
@@ -26,13 +28,14 @@ public class TransferService {
     /* --- FONCTION PRINCIPALE POUR LA PAGE DE TRANSFERT --- */
 
     @Transactional
-    public Transfer createTransfer(Integer senderId, Integer receiverId, BigDecimal amount, String description) {
+    public TransferResponseDTO createTransfer(Integer senderId, Integer receiverId, BigDecimal amount, String description) {
         if (senderId == null || receiverId == null) {
             throw new IllegalArgumentException("Les identifiants émetteur et destinataire sont requis");
         }
         if (senderId.equals(receiverId)) {
             throw new IllegalArgumentException("Impossible de se rembourser soi-même");
         }
+
         validateAmount(amount);
 
         User sender = userRepository.findById(senderId)
@@ -54,23 +57,28 @@ public class TransferService {
                 .description(normalizedDescription)
                 .build();
 
-        return transferRepository.save(transfer);
+        Transfer saved = transferRepository.save(transfer);
+        return toSentDto(saved);
     }
 
     /* --- HISTORIQUE : UTILISÉ POUR REMPLIR "MES TRANSACTIONS" --- */
 
-    public Page<Transfer> listSent(Integer senderId, Pageable pageable) {
+    @Transactional
+    public Page<TransferResponseDTO> listSent(Integer senderId, Pageable pageable) {
         if (senderId == null) {
             throw new IllegalArgumentException("Identifiant utilisateur requis");
         }
-        return transferRepository.findBySenderId(senderId, pageable);
+        Page<Transfer> page = transferRepository.findBySenderId(senderId, pageable);
+        return page.map(this::toSentDto);
     }
 
-    public Page<Transfer> listReceived(Integer receiverId, Pageable pageable) {
+    @Transactional
+    public Page<TransferResponseDTO> listReceived(Integer receiverId, Pageable pageable) {
         if (receiverId == null) {
             throw new IllegalArgumentException("Identifiant utilisateur requis");
         }
-        return transferRepository.findByReceiverId(receiverId, pageable);
+        Page<Transfer> page = transferRepository.findByReceiverId(receiverId, pageable);
+        return page.map(this::toReceivedDto);
     }
 
     /* --- MÉTHODES PRIVÉES --- */
@@ -93,5 +101,22 @@ public class TransferService {
         if (trimmed.isEmpty()) return null;
         return trimmed.length() > 255 ? trimmed.substring(0, 255) : trimmed;
     }
-}
 
+    private TransferResponseDTO toSentDto(Transfer t) {
+        return new TransferResponseDTO(
+                t.getId(),
+                t.getReceiver().getUsername(),
+                t.getDescription(),
+                t.getAmount()
+        );
+    }
+
+    private TransferResponseDTO toReceivedDto(Transfer t) {
+        return new TransferResponseDTO(
+                t.getId(),
+                t.getSender().getUsername(),
+                t.getDescription(),
+                t.getAmount()
+        );
+    }
+}
