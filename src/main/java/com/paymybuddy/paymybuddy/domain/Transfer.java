@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
+import java.time.LocalDateTime;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
 
@@ -58,4 +60,9 @@ public class Transfer {
     private boolean isSenderDifferentFromReceiver() {
         return sender == null || !sender.equals(receiver);
     }
+
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
 }

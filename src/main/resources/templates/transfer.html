@@ -129,14 +129,13 @@
 
         <!-- Formulaire de transfert -->
         <form class="transfer-form" th:action="@{/transfer}" method="post">
-            <select name="toUserId" required>
-                <option value="" selected disabled>Sélectionner une relation</option>
-                <!-- Exemple Thymeleaf si tu ajoutes des relations dans le modèle plus tard :
+            <select name="connectionId" class="transfer-select">
+                <option value="">Sélectionner une relation</option>
+
                 <option th:each="rel : ${relations}"
                         th:value="${rel.id}"
                         th:text="${rel.username}">
                 </option>
-                -->
             </select>
 
             <input type="text" name="description" placeholder="Description" required>
@@ -156,24 +155,22 @@
                     <th>Relations</th>
                     <th>Description</th>
                     <th>Montant</th>
+                    <th>Date</th>
                 </tr>
                 </thead>
                 <tbody>
-                <!-- Exemple statique (tu remplaceras par Thymeleaf plus tard) -->
-                <tr>
-                    <td>Laure-Anne</td>
-                    <td>Restaurant</td>
-                    <td>10€</td>
-                </tr>
-                <tr>
-                    <td>Clara</td>
-                    <td>Voyage</td>
-                    <td>25€</td>
-                </tr>
-                <tr>
-                    <td>Luc</td>
-                    <td>Billets de cinéma</td>
-                    <td>8€</td>
+                <tr th:each="t : ${history}">
+                    <td>
+                         <span th:if="${t.sender.id == currentUserId}">
+                            Envoyé à <b th:text="${t.receiver.username}"></b>
+                         </span>
+                        <span th:if="${t.receiver.id == currentUserId}">
+                            Reçu de <b th:text="${t.sender.username}"></b>
+                        </span>
+                    </td>
+                    <td th:text="${t.description}"></td>
+                    <td th:text="${t.amount} + ' €'"></td>
+                    <td th:text="${#temporals.format(t.createdAt, 'dd/MM/yyyy HH:mm')}"></td>
                 </tr>
                 </tbody>
             </table>

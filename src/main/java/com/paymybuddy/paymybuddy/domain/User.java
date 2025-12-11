@@ -51,7 +51,7 @@ public class User {
     private String password;
 
     @Builder.Default
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_connection",
             joinColumns = @JoinColumn(name = "user_id", foreignKey = @ForeignKey(name = "fk_uc_user")),
