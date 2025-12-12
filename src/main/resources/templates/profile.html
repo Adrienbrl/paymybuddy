@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="fr">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <title>Profil – Pay My Buddy</title>
 
     <style>
@@ -47,44 +47,85 @@
             padding: 40px 80px;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
         }
 
         .profile-card {
             background-color: #ffffff;
             border-radius: 4px;
             border: 1px solid #ddd;
-            padding: 40px 80px;
+            padding: 40px 56px;
             min-width: 520px;
+            max-width: 640px;
         }
 
         .profile-row {
             display: flex;
-            justify-content: space-between;
             align-items: center;
             margin-bottom: 16px;
-            font-size: 14px;
         }
 
         .profile-label {
+            width: 140px;
             font-weight: 600;
-            width: 120px;
         }
 
         .profile-value {
             flex: 1;
-            color: #555555;
+        }
+
+        .profile-value input {
+            width: 100%;
+            max-width: 320px;
+            padding: 6px 10px;
+            font-size: 14px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+
+        .profile-value input:focus {
+            outline: none;
+            border-color: #1976d2;
+            box-shadow: 0 0 0 1px rgba(25,118,210,0.25);
         }
 
         .edit-button {
-            margin-top: 24px;
+            margin-top: 16px;
             padding: 10px 24px;
             border-radius: 4px;
             border: none;
-            background-color: #f4a025;
-            color: white;
+            background-color: #f5a623;
+            color: #ffffff;
             font-weight: 600;
             cursor: pointer;
+        }
+
+        .edit-button:hover {
+            background-color: #e09119;
+        }
+
+        .profile-separator {
+            margin: 24px 0;
+            border: none;
+            border-top: 1px solid #ddd;
+        }
+
+        .success-message,
+        .error-message {
+            margin-bottom: 16px;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .success-message {
+            background-color: #e6ffed;
+            border: 1px solid #34c759;
+        }
+
+        .error-message {
+            background-color: #ffecec;
+            border: 1px solid #ff3b30;
         }
     </style>
 </head>
@@ -105,22 +146,106 @@
     <main>
         <section class="profile-card">
 
-            <div class="profile-row">
-                <div class="profile-label">Username</div>
-                <div class="profile-value" th:text="${username}">@username</div>
+            <!-- Message de succès -->
+            <div th:if="${successMessage}" class="alert alert-success">
+                <span th:text="${successMessage}"></span>
             </div>
 
-            <div class="profile-row">
-                <div class="profile-label">Mail</div>
-                <div class="profile-value" th:text="${email}">nom@domain.com</div>
+            <!-- Messages de succès / erreur (profil ou mot de passe) -->
+            <div th:if="${successMessage}" class="success-message" role="status">
+                <p th:text="${successMessage}"></p>
+            </div>
+            <div th:if="${errorMessage}" class="error-message" role="alert">
+                <p th:text="${errorMessage}"></p>
             </div>
 
-            <div class="profile-row">
-                <div class="profile-label">Mot de passe</div>
-                <div class="profile-value">********</div>
-            </div>
+            <!-- Formulaire de mise à jour du profil (username + mail) -->
+            <form th:action="@{/profile}" th:object="${user}" method="post">
+                <div class="profile-row">
+                    <div class="profile-label">
+                        <label for="username">Username</label>
+                    </div>
+                    <div class="profile-value">
+                        <input id="username"
+                               type="text"
+                               th:field="*{username}"
+                               autocomplete="username"
+                               required />
+                    </div>
+                </div>
 
-            <button type="button" class="edit-button">Modifier</button>
+                <div class="profile-row">
+                    <div class="profile-label">
+                        <label for="email">Mail</label>
+                    </div>
+                    <div class="profile-value">
+                        <input id="email"
+                               type="email"
+                               th:field="*{email}"
+                               autocomplete="email"
+                               required />
+                    </div>
+                </div>
+
+                <div class="profile-row">
+                    <div class="profile-label">Mot de passe</div>
+                    <div class="profile-value">
+                        ********
+                    </div>
+                </div>
+
+                <button type="submit" class="edit-button">
+                    Modifier
+                </button>
+            </form>
+
+            <hr class="profile-separator"/>
+
+            <!-- Formulaire de changement de mot de passe -->
+            <form th:action="@{/profile/password}" method="post">
+                <div class="profile-row">
+                    <div class="profile-label">
+                        <label for="oldPassword">Ancien mot de passe</label>
+                    </div>
+                    <div class="profile-value">
+                        <input id="oldPassword"
+                               name="oldPassword"
+                               type="password"
+                               autocomplete="current-password"
+                               required />
+                    </div>
+                </div>
+
+                <div class="profile-row">
+                    <div class="profile-label">
+                        <label for="newPassword">Nouveau mot de passe</label>
+                    </div>
+                    <div class="profile-value">
+                        <input id="newPassword"
+                               name="newPassword"
+                               type="password"
+                               autocomplete="new-password"
+                               required />
+                    </div>
+                </div>
+
+                <div class="profile-row">
+                    <div class="profile-label">
+                        <label for="confirmPassword">Confirmer</label>
+                    </div>
+                    <div class="profile-value">
+                        <input id="confirmPassword"
+                               name="confirmPassword"
+                               type="password"
+                               autocomplete="new-password"
+                               required />
+                    </div>
+                </div>
+
+                <button type="submit" class="edit-button">
+                    Modifier le mot de passe
+                </button>
+            </form>
 
         </section>
     </main>

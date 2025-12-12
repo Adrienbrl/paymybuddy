@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -105,9 +106,60 @@ public class AppPageController {
             return "redirect:/login";
         }
 
-        User user = userService.getById(userId);
-        model.addAttribute("user", user);
+        User currentUser = userService.getById(userId);
+        model.addAttribute("user", currentUser);
 
         return "profile";
+    }
+
+    @PostMapping("/profile")
+    public String updateProfile(
+            @ModelAttribute("user") User formUser,
+            HttpSession session,
+            RedirectAttributes redirectAttributes) {
+
+        Integer userId = (Integer) session.getAttribute("userId");
+        if (userId == null) {
+            return "redirect:/login";
+        }
+
+        try {
+            userService.updateProfile(userId, formUser.getUsername(), formUser.getEmail());
+            redirectAttributes.addFlashAttribute("successMessage", "Profil mis à jour.");
+        } catch (IllegalArgumentException e) {
+            // 👉 ça peut être "Aucune modification détectée." ou "Username déjà utilisé", etc.
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        }
+        return "redirect:/profile";
+    }
+
+
+    @PostMapping("/profile/password")
+    public String changePassword(
+            @RequestParam("oldPassword") String oldPassword,
+            @RequestParam("newPassword") String newPassword,
+            @RequestParam("confirmPassword") String confirmPassword,
+            HttpSession session,
+            RedirectAttributes redirectAttributes) {
+
+        Integer userId = (Integer) session.getAttribute("userId");
+        if (userId == null) {
+            return "redirect:/login";
+        }
+
+        if (!newPassword.equals(confirmPassword)) {
+            redirectAttributes.addFlashAttribute("errorMessage",
+                    "Les nouveaux mots de passe ne correspondent pas.");
+            return "redirect:/profile";
+        }
+
+        try {
+            userService.changePassword(userId, oldPassword, newPassword);
+            redirectAttributes.addFlashAttribute("successMessage",
+                    "Mot de passe mis à jour.");
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        }
+        return "redirect:/profile";
     }
 }

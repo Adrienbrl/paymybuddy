@@ -92,21 +92,29 @@ public class UserService {
     public User updateProfile(Integer id, String newUsername, String newEmail) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Utilisateur introuvable"));
+        boolean changed = false;
 
         if (newUsername != null && !newUsername.isBlank() && !newUsername.equals(user.getUsername())) {
             if (userRepository.existsByUsername(newUsername)) {
                 throw new IllegalArgumentException("Username déjà utilisé");
             }
             user.setUsername(newUsername);
+            changed = true;
         }
         if (newEmail != null && !newEmail.isBlank() && !newEmail.equals(user.getEmail())) {
             if (userRepository.existsByEmail(newEmail)) {
                 throw new IllegalArgumentException("Email déjà utilisé");
             }
             user.setEmail(newEmail);
+            changed = true;
+        }
+        if (!changed) {
+            // 👉 aucun champ modifié = on considère que ce n'est pas une vraie mise à jour
+            throw new IllegalArgumentException("Aucune modification détectée.");
         }
         return user;
     }
+
 
     @Transactional
     public void changePassword(Integer id, String oldRawPassword, String newRawPassword) {
