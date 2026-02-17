@@ -8,14 +8,24 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
+/**
+ * Repository JPA des transferts.
+ */
 public interface TransferRepository extends JpaRepository<Transfer, Integer> {
 
-    // Historique des transferts ÉMIS par un utilisateur (paginé)
+    /**
+     * Historique paginé des transferts émis.
+     */
     Page<Transfer> findBySenderId(Integer senderId, Pageable pageable);
 
-    // Historique des transferts REÇUS par un utilisateur (paginé)
+    /**
+     * Historique paginé des transferts reçus.
+     */
     Page<Transfer> findByReceiverId(Integer receiverId, Pageable pageable);
 
+    /**
+     * Historique complet des transferts émis triés du plus récent au plus ancien.
+     */
     @Query("SELECT t FROM Transfer t " +
             "JOIN FETCH t.sender " +
             "JOIN FETCH t.receiver " +

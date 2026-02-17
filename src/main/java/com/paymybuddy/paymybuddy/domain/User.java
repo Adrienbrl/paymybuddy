@@ -12,6 +12,12 @@ import lombok.*;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Entité métier représentant un utilisateur de la plateforme.
+ * <p>
+ * Un utilisateur possède des informations d'authentification et une liste de relations
+ * (autres utilisateurs autorisés pour les transferts).
+ */
 @Entity
 @Table(
         name = "user",
@@ -64,12 +70,22 @@ public class User {
     @JsonIgnore
     private Set<User> connectedToMe = new HashSet<>();
 
+    /**
+     * Ajoute une relation sortante vers un autre utilisateur.
+     *
+     * @param other utilisateur à lier.
+     */
     public void addConnection(User other) {
         if (other == null || this.equals(other)) return;
         this.connections.add(other);
         other.connectedToMe.add(this);
     }
 
+    /**
+     * Supprime une relation sortante.
+     *
+     * @param other utilisateur à retirer.
+     */
     public void removeConnection(User other) {
         if (other == null) return;
         this.connections.remove(other);

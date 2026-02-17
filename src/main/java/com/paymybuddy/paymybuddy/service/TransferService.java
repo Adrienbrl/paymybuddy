@@ -14,6 +14,9 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.NoSuchElementException;
 
+/**
+ * Service métier des transferts d'argent entre utilisateurs.
+ */
 @Service
 public class TransferService {
 
@@ -25,8 +28,9 @@ public class TransferService {
         this.userRepository = userRepository;
     }
 
-    /* --- FONCTION PRINCIPALE POUR LA PAGE DE TRANSFERT --- */
-
+    /**
+     * Crée un transfert après validation des règles métier.
+     */
     @Transactional
     public TransferResponseDTO createTransfer(Integer senderId, Integer receiverId, BigDecimal amount, String description) {
         if (senderId == null || receiverId == null) {
@@ -61,8 +65,9 @@ public class TransferService {
         return toSentDto(saved);
     }
 
-    /* --- HISTORIQUE : UTILISÉ POUR REMPLIR "MES TRANSACTIONS" --- */
-
+    /**
+     * Retourne l'historique paginé des transferts envoyés.
+     */
     @Transactional
     public Page<TransferResponseDTO> listSent(Integer senderId, Pageable pageable) {
         if (senderId == null) {
@@ -72,6 +77,9 @@ public class TransferService {
         return page.map(this::toSentDto);
     }
 
+    /**
+     * Retourne l'historique paginé des transferts reçus.
+     */
     @Transactional
     public Page<TransferResponseDTO> listReceived(Integer receiverId, Pageable pageable) {
         if (receiverId == null) {
@@ -81,8 +89,9 @@ public class TransferService {
         return page.map(this::toReceivedDto);
     }
 
-    /* --- MÉTHODES PRIVÉES --- */
-
+    /**
+     * Vérifie la validité métier du montant.
+     */
     private static void validateAmount(BigDecimal amount) {
         if (amount == null) {
             throw new IllegalArgumentException("Montant requis");
@@ -95,6 +104,9 @@ public class TransferService {
         }
     }
 
+    /**
+     * Nettoie et tronque la description pour respecter le schéma SQL.
+     */
     private static String normalizeDescription(String description) {
         if (description == null) return null;
         String trimmed = description.trim();
@@ -102,6 +114,9 @@ public class TransferService {
         return trimmed.length() > 255 ? trimmed.substring(0, 255) : trimmed;
     }
 
+    /**
+     * Construit la réponse API côté envoi (nom de la relation = destinataire).
+     */
     private TransferResponseDTO toSentDto(Transfer t) {
         return new TransferResponseDTO(
                 t.getId(),
@@ -111,6 +126,9 @@ public class TransferService {
         );
     }
 
+    /**
+     * Construit la réponse API côté réception (nom de la relation = émetteur).
+     */
     private TransferResponseDTO toReceivedDto(Transfer t) {
         return new TransferResponseDTO(
                 t.getId(),

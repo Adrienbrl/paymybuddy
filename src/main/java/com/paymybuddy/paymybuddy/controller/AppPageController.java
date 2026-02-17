@@ -17,6 +17,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.util.List;
 import java.math.BigDecimal;
 
+/**
+ * Contrôleur MVC des pages applicatives après connexion.
+ */
 @Controller
 public class AppPageController {
 
@@ -31,6 +34,9 @@ public class AppPageController {
         this.transferRepository = transferRepository;
     }
 
+    /**
+     * Affiche la page de transfert avec relations et historique envoyé.
+     */
     @GetMapping("/transfer")
     public String showTransferPage(HttpSession session, Model model) {
 
@@ -42,7 +48,6 @@ public class AppPageController {
         User currentUser = userService.getById(userId);
         model.addAttribute("relations", currentUser.getConnections());
         model.addAttribute("currentUserId", userId);
-        // on remplira l'historique de transactions plus tard
 
         List<Transfer> history = transferRepository
                 .findBySenderIdOrderByCreatedAtDesc(userId);
@@ -52,6 +57,9 @@ public class AppPageController {
         return "transfer";
     }
 
+    /**
+     * Soumet un transfert depuis le formulaire web.
+     */
     @PostMapping("/transfer")
     public String createTransfer(@RequestParam("connectionId") Integer connectionId,
                                  @RequestParam("description") String description,
@@ -71,12 +79,7 @@ public class AppPageController {
         }
 
         try {
-            transferService.createTransfer(
-                    userId,
-                    connectionId,
-                    amount,
-                    description
-            );
+            transferService.createTransfer(userId, connectionId, amount, description);
             redirectAttributes.addFlashAttribute("successMessage",
                     "Transfert effectué avec succès.");
 
@@ -87,6 +90,9 @@ public class AppPageController {
         return "redirect:/transfer";
     }
 
+    /**
+     * Affiche la page d'ajout de relation.
+     */
     @GetMapping("/add-connection")
     public String showAddConnectionPage(HttpSession session, Model model) {
 
@@ -98,6 +104,9 @@ public class AppPageController {
         return "add-connection";
     }
 
+    /**
+     * Affiche la page profil avec les données courantes.
+     */
     @GetMapping("/profile")
     public String showProfilePage(HttpSession session, Model model) {
 
@@ -112,6 +121,9 @@ public class AppPageController {
         return "profile";
     }
 
+    /**
+     * Met à jour username/email du profil connecté.
+     */
     @PostMapping("/profile")
     public String updateProfile(
             @ModelAttribute("user") User formUser,
@@ -127,13 +139,15 @@ public class AppPageController {
             userService.updateProfile(userId, formUser.getUsername(), formUser.getEmail());
             redirectAttributes.addFlashAttribute("successMessage", "Profil mis à jour.");
         } catch (IllegalArgumentException e) {
-            // 👉 ça peut être "Aucune modification détectée." ou "Username déjà utilisé", etc.
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         }
         return "redirect:/profile";
     }
 
 
+    /**
+     * Met à jour le mot de passe du profil connecté.
+     */
     @PostMapping("/profile/password")
     public String changePassword(
             @RequestParam("oldPassword") String oldPassword,

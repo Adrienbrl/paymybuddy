@@ -9,6 +9,9 @@ import org.springframework.stereotype.Service;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
+/**
+ * Service métier centré sur la gestion des utilisateurs.
+ */
 @Service
 public class UserService {
     private final UserRepository userRepository;
@@ -19,8 +22,14 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    /* --- FONCTIONS POUR LA PAGE D'INSCRIPTION --- */
-
+    /**
+     * Crée un nouvel utilisateur avec un mot de passe chiffré.
+     *
+     * @param username nom public de l'utilisateur.
+     * @param email email unique de connexion.
+     * @param rawPassword mot de passe en clair.
+     * @return utilisateur persisté.
+     */
     @Transactional
     public User register(String username, String email, String rawPassword){
         if (username == null || username.isBlank() || email == null || email.isBlank()
@@ -41,8 +50,13 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    /* --- FONCTIONS POUR LA PAGE DE CONNEXION --- */
-
+    /**
+     * Authentifie un utilisateur via email/mot de passe.
+     *
+     * @param email email de connexion.
+     * @param rawPassword mot de passe en clair.
+     * @return utilisateur authentifié.
+     */
     public User authenticateByEmail(String email, String rawPassword) {
         Optional<User> optional = userRepository.findByEmail(email);
         User user = optional.orElseThrow(() -> new IllegalArgumentException("Email ou mot de passe invalide"));
@@ -53,19 +67,25 @@ public class UserService {
         return user;
     }
 
+    /**
+     * Récupère un utilisateur par son identifiant.
+     */
     public User getById(Integer id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Utilisateur introuvable"));
     }
 
+    /**
+     * Récupère un utilisateur par son email.
+     */
     public User getByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new NoSuchElementException("Utilisateur introuvable"));
     }
 
-
-    /* --- FONCTIONS POUR LA PAGE D'AJOUT D'UNE RELATION --- */
-
+    /**
+     * Ajoute une relation d'un utilisateur vers un autre.
+     */
     @Transactional
     public void addConnection(Integer userId, Integer otherUserId) {
         if (userId == null || otherUserId == null) {
@@ -86,8 +106,11 @@ public class UserService {
         u1.addConnection(u2);
     }
 
-    /* --- FONCTIONS POUR LA PAGE DE PROFIl --- */
-
+    /**
+     * Met à jour username et/ou email d'un utilisateur.
+     *
+     * @return entité mise à jour.
+     */
     @Transactional
     public User updateProfile(Integer id, String newUsername, String newEmail) {
         User user = userRepository.findById(id)
@@ -109,13 +132,14 @@ public class UserService {
             changed = true;
         }
         if (!changed) {
-            // 👉 aucun champ modifié = on considère que ce n'est pas une vraie mise à jour
             throw new IllegalArgumentException("Aucune modification détectée.");
         }
         return user;
     }
 
-
+    /**
+     * Met à jour le mot de passe utilisateur après vérification de l'ancien.
+     */
     @Transactional
     public void changePassword(Integer id, String oldRawPassword, String newRawPassword) {
         User user = userRepository.findById(id)

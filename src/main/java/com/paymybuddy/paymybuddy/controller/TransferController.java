@@ -10,6 +10,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * API REST dédiée aux transferts d'un utilisateur.
+ */
 @RestController
 @RequestMapping("/api/users/{id}/transfers")
 public class TransferController {
@@ -20,14 +23,17 @@ public class TransferController {
         this.transferService = transferService;
     }
 
+    /**
+     * Crée un transfert sortant pour l'utilisateur courant.
+     */
     @PostMapping
     public ResponseEntity<TransferResponseDTO> createTransfer(
             @PathVariable Integer id,
             @Valid @RequestBody CreateTransferRequestDTO req
     ) {
         TransferResponseDTO transfer = transferService.createTransfer(
-                id,               // senderId
-                req.toUserId(),   // receiverId
+                id,
+                req.toUserId(),
                 req.amount(),
                 req.description()
         );
@@ -37,6 +43,9 @@ public class TransferController {
                 .body(transfer);
     }
 
+    /**
+     * Liste paginée des transferts envoyés.
+     */
     @GetMapping("/sent")
     public ResponseEntity<Page<TransferResponseDTO>> listSent(
             @PathVariable Integer id,
@@ -46,6 +55,9 @@ public class TransferController {
         return ResponseEntity.ok(page);
     }
 
+    /**
+     * Liste paginée des transferts reçus.
+     */
     @GetMapping("/received")
     public ResponseEntity<Page<TransferResponseDTO>> listReceived(
             @PathVariable Integer id,

@@ -10,6 +10,9 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
 
+/**
+ * Entité représentant un transfert d'argent entre deux utilisateurs.
+ */
 @Entity
 @Table(
         name = "transfer",
@@ -56,6 +59,11 @@ public class Transfer {
     @Column(name = "amount", nullable = false, precision = 12, scale = 2)
     private BigDecimal amount;
 
+    /**
+     * Contrainte de validation: un utilisateur ne peut pas s'envoyer un transfert.
+     *
+     * @return {@code true} si l'émetteur et le destinataire sont différents.
+     */
     @AssertTrue(message = "sender and receiver must be different")
     private boolean isSenderDifferentFromReceiver() {
         return sender == null || !sender.equals(receiver);

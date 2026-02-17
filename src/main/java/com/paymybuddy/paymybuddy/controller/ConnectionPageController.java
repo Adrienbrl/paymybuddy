@@ -7,6 +7,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+/**
+ * Contrôleur MVC dédié à l'ajout de relations via formulaire.
+ */
 @Controller
 public class ConnectionPageController {
 
@@ -16,6 +19,9 @@ public class ConnectionPageController {
         this.userService = userService;
     }
 
+    /**
+     * Ajoute une relation en se basant sur l'email saisi.
+     */
     @PostMapping("/add-connection")
     public String addConnection(@RequestParam("email") String friendEmail, HttpSession session) {
 

@@ -6,6 +6,13 @@ import jakarta.validation.constraints.Positive;
 
 import java.math.BigDecimal;
 
+/**
+ * Requête de création de transfert.
+ *
+ * @param toUserId identifiant du destinataire.
+ * @param description description du transfert.
+ * @param amount montant strictement positif.
+ */
 public record CreateTransferRequestDTO(
         @NotNull Integer toUserId,
         @NotBlank String description,
